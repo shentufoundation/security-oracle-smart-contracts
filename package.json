@@ -1,0 +1,19 @@
+{
+  "name": "certik-security-oracle",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "truffle build",
+    "console": "truffle console",
+    "migrate": "truffle migrate --network development",
+    "deploy": "truffle deploy --network development",
+    "test": "truffle test"
+  },
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^1.0.42"
+  },
+  "devDependencies": {
+    "truffle": "^5.1.37"
+  }
+}
