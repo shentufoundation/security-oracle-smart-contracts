@@ -8,7 +8,8 @@ contract CertiKSecurityOracle is Ownable {
   event Inquiry(
     address indexed source,
     address indexed target,
-    bytes4 functionSignature
+    bytes4 functionSignature,
+    uint8 score
   );
   event ResultUpdate(
     address indexed target,
@@ -37,21 +38,25 @@ contract CertiKSecurityOracle is Ownable {
     public
     returns (uint8)
   {
-    emit Inquiry(msg.sender, contractAddress, functionSignature);
-
     Result storage result = _results[contractAddress][functionSignature];
 
+    uint8 score = 0;
+
     if (result.expiration > block.timestamp) {
-      return result.score;
+      score = result.score;
+    } else {
+      score = _defaultScore;
     }
 
-    return _defaultScore;
+    emit Inquiry(msg.sender, contractAddress, functionSignature, score);
+
+    return score;
   }
 
-  function getSecurityScore(address contractAddress, string memory functionSignature)
-    public
-    returns (uint8)
-  {
+  function getSecurityScore(
+    address contractAddress,
+    string memory functionSignature
+  ) public returns (uint8) {
     return
       getSecurityScore(
         contractAddress,

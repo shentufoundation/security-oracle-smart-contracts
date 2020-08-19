@@ -13,9 +13,9 @@ import "./certik/CertiKSecurityOracle.sol";
 
 contract MinimalExample {
   function secureCall() public {
-    address securityOracleAddress = 0x152E88111e7C8f51fbdBbF1723B330a330117CAf;
+    address securityOracleAddress = address(0x97f24e544c19280ec319f29de751e95b1d8c05e2#code);
 
-    address targetAddress = 0xfa308d59067470487C38Eaf4d586EA21F1b0032b;
+    address targetAddress = address(0xfa308d59067470487C38Eaf4d586EA21F1b0032b);
     string functionSignature = "getPrice(string)";
 
     uint8 score = CertiKSecurityOracle(securityOracleAddress).getSecurityScore(
