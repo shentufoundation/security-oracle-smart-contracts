@@ -20,7 +20,6 @@ interface SecurityOracle {
 }
 
 contract DeFiExample {
-  event BT(bytes4 bt);
   event Score(uint8 score);
   event Success(address addr, bytes4 sig);
 
@@ -28,12 +27,6 @@ contract DeFiExample {
 
   constructor(address securityOracleAddress) public {
     _securityOracleAddress = securityOracleAddress;
-  }
-
-  function testByte4() public {
-    bytes4 tt = bytes4(keccak256(abi.encodePacked("")));
-
-    emit BT(tt);
   }
 
   function callGetSecurityScore(address addr, bytes4 sig) public {
