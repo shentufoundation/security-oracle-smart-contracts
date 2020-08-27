@@ -1,7 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.21 <0.7.0;
 
-import "./CertiKSecurityOracle.sol";
+interface SecurityOracle {
+  function getSecurityScore(address contractAddress) external returns (uint8);
+
+  function getSecurityScore(
+    address contractAddress,
+    string calldata functionSignature
+  ) external returns (uint8);
+
+  function getSecurityScore(address contractAddress, bytes4 functionSignature)
+    external
+    returns (uint8);
+
+  function getSecurityScores(
+    address[] calldata addresses,
+    bytes4[] calldata functionSignatures
+  ) external returns (uint8[] memory);
+}
 
 contract DeFiExample {
   event Score(uint8 score);
@@ -14,7 +30,10 @@ contract DeFiExample {
   }
 
   function callGetSecurityScore(address addr, bytes4 sig) public {
-    uint8 score = CertiKSecurityOracle(_securityOracleAddress).getSecurityScore(addr, sig);
+    uint8 score = SecurityOracle(_securityOracleAddress).getSecurityScore(
+      addr,
+      sig
+    );
 
     emit Score(score);
 
@@ -37,7 +56,7 @@ contract DeFiExample {
       keccak256(abi.encodePacked("getPrice2(string)"))
     );
 
-    uint8[] memory scores = CertiKSecurityOracle(_securityOracleAddress)
+    uint8[] memory scores = SecurityOracle(_securityOracleAddress)
       .getSecurityScores(addresses, functionSignatures);
 
     for (uint256 i = 0; i < scores.length; i++) {

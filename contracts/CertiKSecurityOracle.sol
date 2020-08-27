@@ -64,6 +64,11 @@ contract CertiKSecurityOracle is Ownable {
       );
   }
 
+  function getSecurityScore(address contractAddress) public returns (uint8) {
+    return
+      getSecurityScore(contractAddress, 0);
+  }
+
   function getSecurityScores(
     address[] memory addresses,
     bytes4[] memory functionSignatures
