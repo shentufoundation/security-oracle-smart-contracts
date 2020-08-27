@@ -4,12 +4,15 @@ Decentralized real-time auditing for your smart contracts.
 
 ## Usage
 
-1. Copy the [contracts](./contracts) directory into `contracts/certik` in your project folder.
-
-2. Follow the minimal example to integrate:
+Follow the following example to integrate. For more complex integration we can refer to [DeFiExample](contracts/DeFiexample.sol).
 
 ```
-import "./certik/CertiKSecurityOracle.sol";
+interface SecurityOracle {
+  function getSecurityScore(
+    address contractAddress,
+    string calldata functionSignature
+  ) external returns (uint8);
+}
 
 contract MinimalExample {
   function secureCall() public {
@@ -18,7 +21,7 @@ contract MinimalExample {
     address targetAddress = address(0xfa308d59067470487C38Eaf4d586EA21F1b0032b);
     string functionSignature = "getPrice(string)";
 
-    uint8 score = CertiKSecurityOracle(securityOracleAddress).getSecurityScore(
+    uint8 score = SecurityOracle(securityOracleAddress).getSecurityScore(
       targetAddress,
       functionSignature
     );

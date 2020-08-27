@@ -49,7 +49,17 @@ contract TestSecurityOracle {
     Assert.equal(
       score,
       DEFAULT_SCORE,
-      "get security score for result missing case wasn't expected"
+      "get security score for string parameter case wasn't expected"
+    );
+  }
+
+  function testGetSecurityScoreContractAddressOnly() public {
+    uint256 score = uint256(so.getSecurityScore(msg.sender));
+
+    Assert.equal(
+      score,
+      DEFAULT_SCORE,
+      "get security score for contract address only case wasn't expected"
     );
   }
 
