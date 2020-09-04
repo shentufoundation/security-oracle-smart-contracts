@@ -2,21 +2,13 @@
 pragma solidity >=0.4.21 <0.7.0;
 
 interface SecurityOracle {
-  function getSecurityScore(address contractAddress) external returns (uint8);
+  function getSecurityScore(address contractAddress) external view returns (uint8);
 
-  function getSecurityScore(
-    address contractAddress,
-    string calldata functionSignature
-  ) external returns (uint8);
+  function getSecurityScore(address contractAddress, string calldata functionSignature) external view returns (uint8);
 
-  function getSecurityScore(address contractAddress, bytes4 functionSignature)
-    external
-    returns (uint8);
+  function getSecurityScore(address contractAddress, bytes4 functionSignature) external view returns (uint8);
 
-  function getSecurityScores(
-    address[] calldata addresses,
-    bytes4[] calldata functionSignatures
-  ) external returns (uint8[] memory);
+  function getSecurityScores(address[] calldata addresses, bytes4[] calldata functionSignatures) external view returns (uint8[] memory);
 }
 
 contract DeFiExample {
@@ -42,7 +34,7 @@ contract DeFiExample {
     emit Success(addr, sig);
   }
 
-  function callGetSecurityScores() public {
+  function callGetSecurityScores() public view {
     address[] memory addresses = new address[](2);
     bytes4[] memory functionSignatures = new bytes4[](2);
 

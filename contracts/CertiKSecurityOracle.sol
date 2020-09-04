@@ -5,12 +5,6 @@ import "./openzeppelin/Ownable.sol";
 
 contract CertiKSecurityOracle is Ownable {
   event Init(uint8 defaultScore);
-  event Inquiry(
-    address indexed source,
-    address indexed target,
-    bytes4 functionSignature,
-    uint8 score
-  );
   event ResultUpdate(
     address indexed target,
     bytes4 functionSignature,
@@ -34,29 +28,23 @@ contract CertiKSecurityOracle is Ownable {
     initialize();
   }
 
-  function getSecurityScore(address contractAddress, bytes4 functionSignature)
-    public
-    returns (uint8)
-  {
+  function getSecurityScore(
+      address contractAddress,
+      bytes4 functionSignature
+    ) public view returns (uint8) {
     Result storage result = _results[contractAddress][functionSignature];
 
-    uint8 score = 0;
-
     if (result.expiration > block.timestamp) {
-      score = result.score;
+      return result.score;
     } else {
-      score = _defaultScore;
+      return _defaultScore;
     }
-
-    emit Inquiry(msg.sender, contractAddress, functionSignature, score);
-
-    return score;
   }
 
   function getSecurityScore(
     address contractAddress,
     string memory functionSignature
-  ) public returns (uint8) {
+  ) public view returns (uint8) {
     return
       getSecurityScore(
         contractAddress,
@@ -64,15 +52,14 @@ contract CertiKSecurityOracle is Ownable {
       );
   }
 
-  function getSecurityScore(address contractAddress) public returns (uint8) {
-    return
-      getSecurityScore(contractAddress, 0);
+  function getSecurityScore(address contractAddress) public view returns (uint8) {
+    return getSecurityScore(contractAddress, 0);
   }
 
   function getSecurityScores(
     address[] memory addresses,
     bytes4[] memory functionSignatures
-  ) public returns (uint8[] memory) {
+  ) public view returns (uint8[] memory) {
     require(
       functionSignatures.length == addresses.length,
       "the length of addresses and functionSignatures must be the same"
