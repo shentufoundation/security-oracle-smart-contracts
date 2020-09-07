@@ -4,14 +4,14 @@ Decentralized real-time auditing for your smart contracts.
 
 ## Usage
 
-Follow the following example to integrate. For more complex integration we can refer to [DeFiExample](contracts/DeFiexample.sol).
+Follow the following example to integrate. For complicated integrations we can check [DeFiExample](contracts/DeFiexample.sol) for a reference.
 
 ```
 interface SecurityOracle {
   function getSecurityScore(
     address contractAddress,
     string calldata functionSignature
-  ) external returns (uint8);
+  ) external view returns (uint8);
 }
 
 contract MinimalExample {
