@@ -27,11 +27,23 @@ contract CertiKSecurityOracle is Ownable {
   constructor() public {
     initialize();
   }
+  
+  function isContract(address _addr) private view returns (bool) {
+    uint32 size;
+    assembly {
+      size := extcodesize(_addr)
+    }
+    return (size > 0);
+  }
 
   function getSecurityScore(
       address contractAddress,
       bytes4 functionSignature
     ) public view returns (uint8) {
+    if (!isContract(contractAddress)) {
+        return 255;
+    }
+
     Result storage result = _results[contractAddress][functionSignature];
 
     if (result.expiration > block.timestamp) {
