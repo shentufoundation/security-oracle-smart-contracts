@@ -27,23 +27,11 @@ contract CertiKSecurityOracle is Ownable {
   constructor() public {
     initialize();
   }
-  
-  function isContract(address _addr) public view returns (bool) {
-    uint32 size;
-    assembly {
-      size := extcodesize(_addr)
-    }
-    return (size > 0);
-  }
 
   function getSecurityScore(
       address contractAddress,
       bytes4 functionSignature
     ) public view returns (uint8) {
-    if (!isContract(contractAddress)) {
-        return 255;
-    }
-
     Result storage result = _results[contractAddress][functionSignature];
 
     if (result.expiration > block.timestamp) {
@@ -83,6 +71,66 @@ contract CertiKSecurityOracle is Ownable {
 
     for (uint256 i = 0; i < len; i++) {
       scores[i] = getSecurityScore(addresses[i], functionSignatures[i]);
+    }
+
+    return scores;
+  }
+  
+  function isContract(address _addr) public view returns (bool) {
+    uint32 size;
+    assembly {
+      size := extcodesize(_addr)
+    }
+    return (size > 0);
+  }
+
+  function getContractSecurityScore(
+      address contractAddress,
+      bytes4 functionSignature
+    ) public view returns (uint8) {
+    if (!isContract(contractAddress)) {
+        return 255;
+    }
+
+    Result storage result = _results[contractAddress][functionSignature];
+
+    if (result.expiration > block.timestamp) {
+      return result.score;
+    } else {
+      return _defaultScore;
+    }
+  }
+
+  function getContractSecurityScore(
+    address contractAddress,
+    string memory functionSignature
+  ) public view returns (uint8) {
+    return
+      getContractSecurityScore(
+        contractAddress,
+        bytes4(keccak256(abi.encodePacked(functionSignature)))
+      );
+  }
+
+  function getContractSecurityScore(address contractAddress) public view returns (uint8) {
+    return getContractSecurityScore(contractAddress, 0);
+  }
+
+  function getContractSecurityScores(
+    address[] memory addresses,
+    bytes4[] memory functionSignatures
+  ) public view returns (uint8[] memory) {
+    require(
+      functionSignatures.length == addresses.length,
+      "the length of addresses and functionSignatures must be the same"
+    );
+
+    uint256 len = addresses.length;
+
+    uint8[] memory scores = new uint8[](len);
+
+    for (uint256 i = 0; i < len; i++) {
+      scores[i] = getContractSecurityScore(addresses[i], functionSignatures[i]);
     }
 
     return scores;
