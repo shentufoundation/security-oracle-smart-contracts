@@ -28,7 +28,7 @@ contract CertiKSecurityOracle is Ownable {
     initialize();
   }
   
-  function isContract(address _addr) private view returns (bool) {
+  function isContract(address _addr) public view returns (bool) {
     uint32 size;
     assembly {
       size := extcodesize(_addr)
