@@ -55,3 +55,9 @@ yarn console
 ```
 yarn test
 ```
+
+## Production
+
+```
+TRUFFLE_PRIVATE_KEY="<wallet-key>" TRUFFLE_RPC="<rpc-endpoint>" yarn deploy --network production
+```

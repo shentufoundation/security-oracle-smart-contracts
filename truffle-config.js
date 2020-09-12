@@ -7,7 +7,7 @@ module.exports = {
       port: 7545,
       network_id: "*"
     },
-    "bsc-test": {
+    production: {
       provider: () => {
         const privateKey = process.env.TRUFFLE_PRIVATE_KEY;
 
@@ -16,10 +16,14 @@ module.exports = {
           process.exit(1);
         }
 
-        return new HDWalletProvider(
-          privateKey,
-          "https://data-seed-prebsc-1-s1.binance.org:8545/"
-        );
+        const rpc = process.env.TRUFFLE_RPC;
+
+        if (!rpc) {
+          console.log("missing env var TRUFFLE_RPC");
+          process.exit(1);
+        }
+
+        return new HDWalletProvider(privateKey, rpc);
       },
       network_id: "*"
     }
