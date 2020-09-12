@@ -7,7 +7,7 @@ module.exports = {
       port: 7545,
       network_id: "*"
     },
-    bsc: {
+    "bsc-test": {
       provider: () => {
         const privateKey = process.env.TRUFFLE_PRIVATE_KEY;
 
