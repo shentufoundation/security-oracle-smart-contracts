@@ -6,7 +6,7 @@ module.exports = async function(deployer, network, accounts) {
     await deployer.deploy(CertiKSecurityOracleProxy,
       CertiKSecurityOracle.address,
       {
-        from: accounts[1]
+        from: accounts[0]
       }
     );
 

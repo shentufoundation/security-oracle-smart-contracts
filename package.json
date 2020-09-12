@@ -6,8 +6,8 @@
   "scripts": {
     "build": "truffle build",
     "console": "truffle console",
-    "migrate": "truffle migrate --network development",
-    "deploy": "truffle deploy --network development",
+    "migrate": "truffle migrate",
+    "migrate": "truffle deploy",
     "test": "truffle test"
   },
   "dependencies": {
