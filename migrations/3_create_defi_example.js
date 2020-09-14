@@ -8,7 +8,7 @@ module.exports = async function (deployer, network, accounts) {
         DeFiExample,
         CertiKSecurityOracle.address,
         {
-          from: accounts[2]
+          from: accounts[0]
         }
       );
 

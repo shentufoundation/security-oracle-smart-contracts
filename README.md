@@ -4,7 +4,7 @@ Decentralized real-time auditing for your smart contracts.
 
 ## Usage
 
-Follow the following example to integrate. For complicated integrations we can check [DeFiExample](contracts/DeFiexample.sol) for a reference.
+Follow the following example to integrate. For complicated integrations we can check [DeFiExample](contracts/DeFiExample.sol) for a reference.
 
 ```
 interface SecurityOracle {
@@ -55,3 +55,11 @@ yarn console
 ```
 yarn test
 ```
+
+## Production
+
+```
+TRUFFLE_PRIVATE_KEY="<wallet-key>" TRUFFLE_RPC="<rpc-endpoint>" yarn deploy --network production
+```
+
+Note that truffle commands like `truffle migrate`/`truffle deploy`/etc would also require the environment variables.
