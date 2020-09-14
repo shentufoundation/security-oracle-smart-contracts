@@ -7,7 +7,7 @@
     "build": "truffle build",
     "console": "truffle console",
     "migrate": "truffle migrate",
-    "migrate": "truffle deploy",
+    "deploy": "truffle deploy",
     "test": "truffle test"
   },
   "dependencies": {
