@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.21 <0.7.0;
+pragma solidity >=0.5.0 <0.6.0;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
@@ -22,17 +22,17 @@ contract TestProxy {
 
   function testProxy() public {
     uint256 proxyScore = uint256(
-      CertiKSecurityOracle(proxy.getProxyAddress())._defaultScore()
+      CertiKSecurityOracle(proxy.getProxyAddress()).defaultScore()
     );
 
-    uint256 directScore = uint256(so._defaultScore());
+    uint256 directScore = uint256(so.defaultScore());
 
     Assert.equal(proxyScore, directScore, "proxy failed");
   }
 
   function testUpgradeOracleAddress() public {
     Assert.equal(
-      proxy._currentOracleAddress(),
+      proxy.currentOracleAddress(),
       address(so),
       "address was not right"
     );
@@ -40,7 +40,7 @@ contract TestProxy {
     proxy.upgradeOracleAddress(address(this));
 
     Assert.equal(
-      proxy._currentOracleAddress(),
+      proxy.currentOracleAddress(),
       address(this),
       "address was not upgraded"
     );
