@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.21 <0.7.0;
+pragma solidity ^0.5.0;
 
 import "./openzeppelin/Ownable.sol";
 
@@ -9,20 +9,20 @@ contract CertiKSecurityOracle is Ownable {
     address indexed target,
     bytes4 functionSignature,
     uint8 score,
-    uint256 expiration
+    uint248 expiration
   );
   event BatchResultUpdate(uint256 length);
   event DefaultScoreChanged(uint8 score);
 
   struct Result {
     uint8 score;
-    uint256 expiration;
+    uint248 expiration;
   }
 
   // stores pushed results
   mapping(address => mapping(bytes4 => Result)) private _results;
   // score to return when we don't have results available
-  uint8 public _defaultScore;
+  uint8 public defaultScore;
 
   constructor() public {
     initialize();
@@ -32,12 +32,13 @@ contract CertiKSecurityOracle is Ownable {
       address contractAddress,
       bytes4 functionSignature
     ) public view returns (uint8) {
-    Result storage result = _results[contractAddress][functionSignature];
+    require(contractAddress != address(0), "address should not be 0x0");
+    Result memory result = _results[contractAddress][functionSignature];
 
     if (result.expiration > block.timestamp) {
       return result.score;
     } else {
-      return _defaultScore;
+      return defaultScore;
     }
   }
 
@@ -80,8 +81,9 @@ contract CertiKSecurityOracle is Ownable {
     address contractAddress,
     bytes4 functionSignature,
     uint8 score,
-    uint256 expiration
+    uint248 expiration
   ) public onlyOwner {
+    require(contractAddress != address(0), "contract address should not be 0x0");
     _results[contractAddress][functionSignature] = Result(score, expiration);
 
     emit ResultUpdate(contractAddress, functionSignature, score, expiration);
@@ -91,7 +93,7 @@ contract CertiKSecurityOracle is Ownable {
     address[] memory contractAddresses,
     bytes4[] memory functionSignatures,
     uint8[] memory scores,
-    uint256[] memory expirations
+    uint248[] memory expirations
   ) public onlyOwner {
     require(
       contractAddresses.length == functionSignatures.length &&
@@ -115,13 +117,13 @@ contract CertiKSecurityOracle is Ownable {
   }
 
   function initialize() public onlyOwner {
-    _defaultScore = 128;
+    defaultScore = 128;
 
-    emit Init(_defaultScore);
+    emit Init(defaultScore);
   }
 
   function updateDefaultScore(uint8 score) public onlyOwner {
-    _defaultScore = score;
+    defaultScore = score;
 
     emit DefaultScoreChanged(score);
   }
