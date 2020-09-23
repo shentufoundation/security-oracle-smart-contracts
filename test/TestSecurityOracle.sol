@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.21 <0.7.0;
+pragma solidity >=0.5 <0.6.0;
 
 import "truffle/Assert.sol";
 import "../contracts/CertiKSecurityOracle.sol";
@@ -13,7 +13,7 @@ contract TestSecurityOracle {
   }
 
   function testDefaultScore() public {
-    uint256 score = uint256(so._defaultScore());
+    uint256 score = uint256(so.defaultScore());
 
     Assert.equal(score, DEFAULT_SCORE, "initial default score wasn't expected");
   }
@@ -21,7 +21,7 @@ contract TestSecurityOracle {
   function testUpdateDefaultScore() public {
     so.updateDefaultScore(0);
 
-    uint256 score = uint256(so._defaultScore());
+    uint256 score = uint256(so.defaultScore());
 
     Assert.equal(score, 0, "updated default score wasn't expected");
   }
@@ -70,7 +70,7 @@ contract TestSecurityOracle {
       msg.sender,
       bytes4(keccak256(abi.encodePacked("getPrice(string)"))),
       uint8(newScore),
-      block.timestamp + 3600
+      uint248(block.timestamp) + 3600
     );
 
     uint256 score = uint256(
@@ -94,7 +94,7 @@ contract TestSecurityOracle {
       msg.sender,
       bytes4(keccak256(abi.encodePacked("getPrice(string)"))),
       uint8(newScore),
-      block.timestamp - 1
+      uint248(block.timestamp) - 1
     );
 
     uint256 score = uint256(
@@ -117,17 +117,17 @@ contract TestSecurityOracle {
     address[] memory contractAddresses = new address[](2);
     bytes4[] memory functionSignatures = new bytes4[](2);
     uint8[] memory scores = new uint8[](2);
-    uint256[] memory expirations = new uint256[](2);
+    uint248[] memory expirations = new uint248[](2);
 
     contractAddresses[0] = msg.sender;
     functionSignatures[0] = (bytes4(keccak256(abi.encodePacked("func1()"))));
     scores[0] = (uint8(newScore));
-    expirations[0] = (block.timestamp + 3600);
+    expirations[0] = (uint248(block.timestamp) + 3600);
 
     contractAddresses[1] = msg.sender;
     functionSignatures[1] = (bytes4(keccak256(abi.encodePacked("func2()"))));
     scores[1] = (uint8(newScore));
-    expirations[1] = (block.timestamp + 3600);
+    expirations[1] = (uint248(block.timestamp) + 3600);
 
     so.batchPushResult(
       contractAddresses,
