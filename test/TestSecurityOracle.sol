@@ -28,7 +28,7 @@ contract TestSecurityOracle {
 
   function testGetSecurityScoreResultMissing() public {
     uint256 score = uint256(
-      so.getSecurityScore(
+      so.getSecurityScoreBytes4(
         msg.sender,
         bytes4(keccak256(abi.encodePacked("getPrice(string)")))
       )
@@ -74,7 +74,7 @@ contract TestSecurityOracle {
     );
 
     uint256 score = uint256(
-      so.getSecurityScore(
+      so.getSecurityScoreBytes4(
         msg.sender,
         bytes4(keccak256(abi.encodePacked("getPrice(string)")))
       )
@@ -98,7 +98,7 @@ contract TestSecurityOracle {
     );
 
     uint256 score = uint256(
-      so.getSecurityScore(
+      so.getSecurityScoreBytes4(
         msg.sender,
         bytes4(keccak256(abi.encodePacked("getPrice(string)")))
       )
@@ -137,7 +137,7 @@ contract TestSecurityOracle {
     );
 
     uint256 func1Score = uint256(
-      so.getSecurityScore(
+      so.getSecurityScoreBytes4(
         msg.sender,
         bytes4(keccak256(abi.encodePacked("func1()")))
       )
@@ -150,7 +150,7 @@ contract TestSecurityOracle {
     );
 
     uint256 func2Score = uint256(
-      so.getSecurityScore(
+      so.getSecurityScoreBytes4(
         msg.sender,
         bytes4(keccak256(abi.encodePacked("func2()")))
       )

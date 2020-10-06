@@ -28,11 +28,11 @@ contract CertiKSecurityOracle is Ownable {
     initialize();
   }
 
-  function getSecurityScore(
-      address contractAddress,
-      bytes4 functionSignature
-    ) public view returns (uint8) {
-    require(contractAddress != address(0), "address should not be 0x0");
+  function _getSecurityScore(address contractAddress, bytes4 functionSignature)
+    internal
+    view
+    returns (uint8)
+  {
     Result memory result = _results[contractAddress][functionSignature];
 
     if (result.expiration > block.timestamp) {
@@ -42,19 +42,38 @@ contract CertiKSecurityOracle is Ownable {
     }
   }
 
+  function getSecurityScoreBytes4(address contractAddress, bytes4 functionSignature)
+    public
+    view
+    returns (uint8)
+  {
+    require(contractAddress != address(0), "address should not be 0x0");
+    require(
+      functionSignature != bytes4(0),
+      "signature bytes4(0) was reserved for special purposes, if your function signature conflicted with this value please consider to rename the function to avoid the conflict"
+    );
+
+    return _getSecurityScore(contractAddress, functionSignature);
+  }
+
   function getSecurityScore(
     address contractAddress,
     string memory functionSignature
   ) public view returns (uint8) {
     return
-      getSecurityScore(
+      getSecurityScoreBytes4(
         contractAddress,
         bytes4(keccak256(abi.encodePacked(functionSignature)))
       );
   }
 
-  function getSecurityScore(address contractAddress) public view returns (uint8) {
-    return getSecurityScore(contractAddress, 0);
+  function getSecurityScore(address contractAddress)
+    public
+    view
+    returns (uint8)
+  {
+    require(contractAddress != address(0), "address should not be 0x0");
+    return _getSecurityScore(contractAddress, bytes4(0));
   }
 
   function getSecurityScores(
@@ -71,7 +90,7 @@ contract CertiKSecurityOracle is Ownable {
     uint8[] memory scores = new uint8[](len);
 
     for (uint256 i = 0; i < len; i++) {
-      scores[i] = getSecurityScore(addresses[i], functionSignatures[i]);
+      scores[i] = getSecurityScoreBytes4(addresses[i], functionSignatures[i]);
     }
 
     return scores;
@@ -83,7 +102,10 @@ contract CertiKSecurityOracle is Ownable {
     uint8 score,
     uint248 expiration
   ) public onlyOwner {
-    require(contractAddress != address(0), "contract address should not be 0x0");
+    require(
+      contractAddress != address(0),
+      "contract address should not be 0x0"
+    );
     _results[contractAddress][functionSignature] = Result(score, expiration);
 
     emit ResultUpdate(contractAddress, functionSignature, score, expiration);
