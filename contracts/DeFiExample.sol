@@ -2,18 +2,31 @@
 pragma solidity 0.5.17;
 
 interface SecurityOracle {
-  function getSecurityScore(address contractAddress) external view returns (uint8);
+  function getSecurityScore(address contractAddress)
+    external
+    view
+    returns (uint8);
 
-  function getSecurityScore(address contractAddress, string calldata functionSignature) external view returns (uint8);
+  function getSecurityScore(
+    address contractAddress,
+    string calldata functionSignature
+  ) external view returns (uint8);
 
-  function getSecurityScore(address contractAddress, bytes4 functionSignature) external view returns (uint8);
+  function getSecurityScoreBytes4(
+    address contractAddress,
+    bytes4 functionSignature
+  ) external view returns (uint8);
 
-  function getSecurityScores(address[] calldata addresses, bytes4[] calldata functionSignatures) external view returns (uint8[] memory);
+  function getSecurityScores(
+    address[] calldata addresses,
+    bytes4[] calldata functionSignatures
+  ) external view returns (uint8[] memory);
 }
 
 contract DeFiExample {
   event Score(uint8 score);
-  event Success(address addr, bytes4 sig);
+  event SuccessBytes4(address addr, bytes4 sig);
+  event SuccessString(address addr, string sig);
 
   address private _securityOracleAddress;
 
@@ -21,7 +34,7 @@ contract DeFiExample {
     _securityOracleAddress = securityOracleAddress;
   }
 
-  function callGetSecurityScore(address addr, bytes4 sig) public {
+  function callGetSecurityScore(address addr, string memory sig) public {
     uint8 score = SecurityOracle(_securityOracleAddress).getSecurityScore(
       addr,
       sig
@@ -31,7 +44,20 @@ contract DeFiExample {
 
     require(score > 100, "revert due to high security risk");
 
-    emit Success(addr, sig);
+    emit SuccessString(addr, sig);
+  }
+
+  function callGetSecurityScoreBytes4(address addr, bytes4 sig) public {
+    uint8 score = SecurityOracle(_securityOracleAddress).getSecurityScoreBytes4(
+      addr,
+      sig
+    );
+
+    emit Score(score);
+
+    require(score > 100, "revert due to high security risk");
+
+    emit SuccessBytes4(addr, sig);
   }
 
   function callGetSecurityScores() public view {
