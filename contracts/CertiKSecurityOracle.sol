@@ -138,13 +138,13 @@ contract CertiKSecurityOracle is Ownable {
     emit BatchResultUpdate(len);
   }
 
-  function initialize() public onlyAdmin {
+  function initialize() public onlyOwner {
     defaultScore = 128;
 
     emit Init(defaultScore);
   }
 
-  function updateDefaultScore(uint8 score) public onlyAdmin {
+  function updateDefaultScore(uint8 score) public onlyOwner {
     defaultScore = score;
 
     emit DefaultScoreChanged(score);
