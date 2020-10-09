@@ -101,7 +101,7 @@ contract CertiKSecurityOracle is Ownable {
     bytes4 functionSignature,
     uint8 score,
     uint248 expiration
-  ) public onlyOwner {
+  ) public onlyAdmin {
     require(
       contractAddress != address(0),
       "contract address should not be 0x0"
@@ -116,7 +116,7 @@ contract CertiKSecurityOracle is Ownable {
     bytes4[] memory functionSignatures,
     uint8[] memory scores,
     uint248[] memory expirations
-  ) public onlyOwner {
+  ) public onlyAdmin {
     require(
       contractAddresses.length == functionSignatures.length &&
         functionSignatures.length == scores.length &&
@@ -138,13 +138,13 @@ contract CertiKSecurityOracle is Ownable {
     emit BatchResultUpdate(len);
   }
 
-  function initialize() public onlyOwner {
+  function initialize() public onlyAdmin {
     defaultScore = 128;
 
     emit Init(defaultScore);
   }
 
-  function updateDefaultScore(uint8 score) public onlyOwner {
+  function updateDefaultScore(uint8 score) public onlyAdmin {
     defaultScore = score;
 
     emit DefaultScoreChanged(score);

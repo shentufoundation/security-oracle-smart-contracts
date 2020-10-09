@@ -13,6 +13,7 @@ import "./Context.sol";
  */
 contract Ownable is Context {
     address private _owner;
+    mapping (address => bool) private _adminMap;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
@@ -22,6 +23,7 @@ contract Ownable is Context {
     constructor () internal {
         address msgSender = _msgSender();
         _owner = msgSender;
+        _adminMap[msgSender] = true;
         emit OwnershipTransferred(address(0), msgSender);
     }
 
@@ -41,10 +43,40 @@ contract Ownable is Context {
     }
 
     /**
+     * @dev Throws if called by any account which is not one of the administers.
+     */
+    modifier onlyAdmin() {
+        require(isAdmin(), "Ownable: caller is not one of the administers");
+        _;
+    }
+
+
+    /**
      * @dev Returns true if the caller is the current owner.
      */
     function isOwner() public view returns (bool) {
         return _msgSender() == _owner;
+    }
+
+    /**
+     * @dev Returns true if the caller is the one of current administers.
+     */
+    function isAdmin() public view returns (bool) {
+        return _adminMap[_msgSender()];
+    }    
+
+    /**
+     * @dev Add new address to admin list.
+     */
+    function addAdmin(address newAdmin) public onlyOwner {
+        _adminMap[newAdmin] = true;
+    }
+
+    /**
+     * @dev Remove address from admin list
+     */
+    function removeAdmin(address newAdmin) public onlyOwner {
+        _adminMap[newAdmin] = false;
     }
 
     /**
