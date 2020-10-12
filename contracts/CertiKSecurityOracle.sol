@@ -124,7 +124,6 @@ contract CertiKSecurityOracle is WhitelistAdminRole, WhitelistedRole {
     uint8[] memory scores,
     uint248[] memory expirations
   ) public onlyAdminList {
-    require(isWhitelistAdmin(msg.sender) || isWhitelisted(msg.sender), "only administrators can push results in batch");
     require(
       contractAddresses.length == functionSignatures.length &&
         functionSignatures.length == scores.length &&
