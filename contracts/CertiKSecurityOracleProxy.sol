@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.5.17;
 
-import "./openzeppelin/Ownable.sol";
+import "./openzeppelin/WhitelistAdminRole.sol";
 import "./openzeppelin/Proxy.sol";
 
-contract CertiKSecurityOracleProxy is Proxy, Ownable {
+contract CertiKSecurityOracleProxy is Proxy, WhitelistAdminRole {
   address public currentOracleAddress;
 
   constructor(address oracleAddress) public {
@@ -21,7 +21,7 @@ contract CertiKSecurityOracleProxy is Proxy, Ownable {
     return currentOracleAddress;
   }
 
-  function upgradeOracleAddress(address oracleAddress) public onlyOwner {
+  function upgradeOracleAddress(address oracleAddress) public onlyWhitelistAdmin {
     currentOracleAddress = oracleAddress;
   }
 

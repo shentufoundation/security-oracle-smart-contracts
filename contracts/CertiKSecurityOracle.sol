@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.5.17;
 
-import "./openzeppelin/Ownable.sol";
+import "./openzeppelin/WhitelistAdminRole.sol";
+import "./openzeppelin/WhitelistedRole.sol";
 
-contract CertiKSecurityOracle is Ownable {
+contract CertiKSecurityOracle is WhitelistAdminRole, WhitelistedRole {
   event Init(uint8 defaultScore);
   event ResultUpdate(
     address indexed target,
@@ -26,6 +27,11 @@ contract CertiKSecurityOracle is Ownable {
 
   constructor() public {
     initialize();
+  }
+
+  modifier onlyAdminList() {
+    require(isWhitelistAdmin(msg.sender) || isWhitelisted(msg.sender), "only administrators can push results");
+    _;
   }
 
   function _getSecurityScore(address contractAddress, bytes4 functionSignature)
@@ -101,11 +107,12 @@ contract CertiKSecurityOracle is Ownable {
     bytes4 functionSignature,
     uint8 score,
     uint248 expiration
-  ) public onlyOwner {
+  ) public onlyAdminList {
     require(
       contractAddress != address(0),
       "contract address should not be 0x0"
     );
+    
     _results[contractAddress][functionSignature] = Result(score, expiration);
 
     emit ResultUpdate(contractAddress, functionSignature, score, expiration);
@@ -116,7 +123,8 @@ contract CertiKSecurityOracle is Ownable {
     bytes4[] memory functionSignatures,
     uint8[] memory scores,
     uint248[] memory expirations
-  ) public onlyOwner {
+  ) public onlyAdminList {
+    require(isWhitelistAdmin(msg.sender) || isWhitelisted(msg.sender), "only administrators can push results in batch");
     require(
       contractAddresses.length == functionSignatures.length &&
         functionSignatures.length == scores.length &&
@@ -138,13 +146,13 @@ contract CertiKSecurityOracle is Ownable {
     emit BatchResultUpdate(len);
   }
 
-  function initialize() public onlyOwner {
+  function initialize() public onlyWhitelistAdmin {
     defaultScore = 128;
 
     emit Init(defaultScore);
   }
 
-  function updateDefaultScore(uint8 score) public onlyOwner {
+  function updateDefaultScore(uint8 score) public onlyWhitelistAdmin {
     defaultScore = score;
 
     emit DefaultScoreChanged(score);
