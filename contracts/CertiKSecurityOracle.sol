@@ -24,7 +24,7 @@ contract CertiKSecurityOracle is AccessControl {
   // score to return when we don't have results available
   uint8 public defaultScore;
   // set permitted contribuer role
-  bytes32 internal constant CONTRIBUTOR_ROLE = keccak256("CONTRIBUTOR_ROLE");
+  bytes32 public constant CONTRIBUTOR_ROLE = keccak256("CONTRIBUTOR_ROLE");
 
   constructor() public {
     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);

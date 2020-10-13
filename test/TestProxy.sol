@@ -16,7 +16,7 @@ contract TestProxy {
     proxy = new CertiKSecurityOracleProxy(address(so));
   }
 
-  function getMyNumber() public returns (uint256) {
+  function getMyNumber() public pure returns (uint256) {
     return 999;
   }
 
