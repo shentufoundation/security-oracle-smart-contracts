@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.5.17;
+pragma solidity 0.6.12;
 
 import "truffle/Assert.sol";
 import "../contracts/CertiKSecurityOracle.sol";

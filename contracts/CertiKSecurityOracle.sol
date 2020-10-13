@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.5.17;
+pragma solidity 0.6.12;
 
-import "./openzeppelin/WhitelistAdminRole.sol";
-import "./openzeppelin/WhitelistedRole.sol";
+import "./openzeppelin/AccessControl.sol";
 
-contract CertiKSecurityOracle is WhitelistAdminRole, WhitelistedRole {
+contract CertiKSecurityOracle is AccessControl {
   event Init(uint8 defaultScore);
   event ResultUpdate(
     address indexed target,
@@ -24,15 +23,50 @@ contract CertiKSecurityOracle is WhitelistAdminRole, WhitelistedRole {
   mapping(address => mapping(bytes4 => Result)) private _results;
   // score to return when we don't have results available
   uint8 public defaultScore;
+  // set permitted contribuer role
+  bytes32 internal constant CONTRIBUTOR_ROLE = keccak256("CONTRIBUTOR_ROLE");
 
   constructor() public {
+    _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     initialize();
   }
 
+
   modifier onlyAdminList() {
-    require(isWhitelistAdmin(msg.sender) || isWhitelisted(msg.sender), "only administrators can push results");
+    require(isContributor(msg.sender) || isAdmin(msg.sender), "restricted to contributer and administrator");
     _;
   }
+
+  modifier onlyAdmin() {
+    require(isAdmin(msg.sender), "restricted to administrator");
+    _;
+  }
+
+
+  function isContributor(address account)
+    public virtual view returns (bool)
+  {
+    return hasRole(CONTRIBUTOR_ROLE, account);
+  }  
+
+
+  function isAdmin(address account)
+    public virtual view returns (bool)
+  {
+    return hasRole(DEFAULT_ADMIN_ROLE, account);
+  }
+
+
+  function addContributor(address account) public virtual onlyAdmin {
+    grantRole(CONTRIBUTOR_ROLE, account);
+  }
+
+
+  function revokeContributor(address account) public virtual onlyAdmin {
+    revokeRole(CONTRIBUTOR_ROLE, account);
+  }
+
+
 
   function _getSecurityScore(address contractAddress, bytes4 functionSignature)
     internal
@@ -145,13 +179,13 @@ contract CertiKSecurityOracle is WhitelistAdminRole, WhitelistedRole {
     emit BatchResultUpdate(len);
   }
 
-  function initialize() public onlyWhitelistAdmin {
+  function initialize() public onlyAdmin {
     defaultScore = 128;
 
     emit Init(defaultScore);
   }
 
-  function updateDefaultScore(uint8 score) public onlyWhitelistAdmin {
+  function updateDefaultScore(uint8 score) public onlyAdmin {
     defaultScore = score;
 
     emit DefaultScoreChanged(score);
