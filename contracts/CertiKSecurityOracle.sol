@@ -24,7 +24,7 @@ contract CertiKSecurityOracle is AccessControl {
   // score to return when we don't have results available
   uint8 public defaultScore;
   // set permitted contribuer role
-  bytes32 public constant CONTRIBUTOR_ROLE = keccak256("CONTRIBUTOR_ROLE");
+  bytes32 public constant COLLABORATOR_ROLE = keccak256("COLLABORATOR_ROLE");
 
   constructor() public {
     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -32,8 +32,8 @@ contract CertiKSecurityOracle is AccessControl {
   }
 
 
-  modifier onlyAdminList() {
-    require(isContributor(msg.sender) || isAdmin(msg.sender), "restricted to contributer and administrator");
+  modifier onlyUsersWithWriteAccess() {
+    require(isCollaborator(msg.sender) || isAdmin(msg.sender), "restricted to contributer and administrator");
     _;
   }
 
@@ -43,10 +43,10 @@ contract CertiKSecurityOracle is AccessControl {
   }
 
 
-  function isContributor(address account)
+  function isCollaborator(address account)
     public virtual view returns (bool)
   {
-    return hasRole(CONTRIBUTOR_ROLE, account);
+    return hasRole(COLLABORATOR_ROLE, account);
   }  
 
 
@@ -57,13 +57,13 @@ contract CertiKSecurityOracle is AccessControl {
   }
 
 
-  function addContributor(address account) public virtual onlyAdmin {
-    grantRole(CONTRIBUTOR_ROLE, account);
+  function addCollaborator(address account) public virtual onlyAdmin {
+    grantRole(COLLABORATOR_ROLE, account);
   }
 
 
-  function revokeContributor(address account) public virtual onlyAdmin {
-    revokeRole(CONTRIBUTOR_ROLE, account);
+  function revokeCollaborator(address account) public virtual onlyAdmin {
+    revokeRole(COLLABORATOR_ROLE, account);
   }
 
 
@@ -141,7 +141,7 @@ contract CertiKSecurityOracle is AccessControl {
     bytes4 functionSignature,
     uint8 score,
     uint248 expiration
-  ) public onlyAdminList {
+  ) public onlyUsersWithWriteAccess {
     require(
       contractAddress != address(0),
       "contract address should not be 0x0"
@@ -157,7 +157,7 @@ contract CertiKSecurityOracle is AccessControl {
     bytes4[] memory functionSignatures,
     uint8[] memory scores,
     uint248[] memory expirations
-  ) public onlyAdminList {
+  ) public onlyUsersWithWriteAccess {
     require(
       contractAddresses.length == functionSignatures.length &&
         functionSignatures.length == scores.length &&
