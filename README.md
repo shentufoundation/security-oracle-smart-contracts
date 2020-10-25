@@ -4,7 +4,11 @@ Decentralized real-time auditing for your smart contracts.
 
 ## Usage
 
-Follow the following example to integrate. For complicated integrations we can check [DeFiExample](contracts/DeFiExample.sol) for a reference.
+Follow the following example to integrate with Security Oracle smart contract on Binance Smart Chain, the smart contract address is [0xE7F15597B7594E1516952001f57d022bA799b479](https://bscscan.com/address/0xE7F15597B7594E1516952001f57d022bA799b479).
+
+Currently we don't have Ethereum version yet due to the high gas fee. If you want to have it please [submit an issue](https://github.com/certikfoundation/security-oracle-smart-contracts/issues/new) in current repo to let us know.
+
+For complicated integrations we can check [DeFiExample](contracts/DeFiExample.sol) for a reference.
 
 ```
 interface SecurityOracle {
@@ -16,9 +20,9 @@ interface SecurityOracle {
 
 contract MinimalExample {
   function secureCall() public {
-    address securityOracleAddress = address(0x97f24e544c19280ec319f29de751e95b1d8c05e2#code);
+    address securityOracleAddress = address(0xE7F15597B7594E1516952001f57d022bA799b479);
 
-    address targetAddress = address(0xfa308d59067470487C38Eaf4d586EA21F1b0032b);
+    address targetAddress = address(0x1234567);
     string functionSignature = "getPrice(string)";
 
     uint8 score = SecurityOracle(securityOracleAddress).getSecurityScore(
