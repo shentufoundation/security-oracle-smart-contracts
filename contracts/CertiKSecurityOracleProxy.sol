@@ -4,7 +4,7 @@ pragma solidity 0.6.12;
 import "./openzeppelin/AccessControl.sol";
 import "./openzeppelin/Proxy.sol";
 
-contract CertiKSecurityOracleProxy is Proxy, AccessControl {
+contract CertiKSecurityOracleProxy is Proxy, AccessControlUpgradeSafe {
   address public currentOracleAddress;
 
   constructor(address oracleAddress) public {

@@ -3,7 +3,7 @@ pragma solidity 0.6.12;
 
 import "./openzeppelin/AccessControl.sol";
 
-contract CertiKSecurityOracle is AccessControl {
+contract CertiKSecurityOracle is AccessControlUpgradeSafe {
   event Init(uint8 defaultScore);
   event ResultUpdate(
     address indexed target,
@@ -23,11 +23,12 @@ contract CertiKSecurityOracle is AccessControl {
   mapping(address => mapping(bytes4 => Result)) private _results;
   // score to return when we don't have results available
   uint8 public defaultScore;
-  // set permitted contribuer role
+  // set permitted collabotator role
   bytes32 public constant COLLABORATOR_ROLE = keccak256("COLLABORATOR_ROLE");
 
   constructor() public {
     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    _setRoleAdmin(COLLABORATOR_ROLE, DEFAULT_ADMIN_ROLE);
     initialize();
   }
 
@@ -57,12 +58,12 @@ contract CertiKSecurityOracle is AccessControl {
   }
 
 
-  function addCollaborator(address account) public virtual onlyAdmin {
+  function addCollaborator(address account) public virtual {
     grantRole(COLLABORATOR_ROLE, account);
   }
 
 
-  function revokeCollaborator(address account) public virtual onlyAdmin {
+  function revokeCollaborator(address account) public virtual {
     revokeRole(COLLABORATOR_ROLE, account);
   }
 

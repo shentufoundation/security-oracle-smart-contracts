@@ -5,6 +5,7 @@ pragma solidity 0.6.12;
 import "./EnumerableSet.sol";
 import "./Address.sol";
 import "./Context.sol";
+import "./Initializable.sol";
 
 /**
  * @dev Contract module that allows children to implement role-based access
@@ -23,7 +24,7 @@ import "./Context.sol";
  *
  * ```
  * function foo() public {
- *     require(hasRole(MY_ROLE, msg.sender));
+ *     require(hasRole(MY_ROLE, _msgSender()));
  *     ...
  * }
  * ```
@@ -36,12 +37,18 @@ import "./Context.sol";
  * that only accounts with this role will be able to grant or revoke other
  * roles. More complex role relationships can be created by using
  * {_setRoleAdmin}.
- *
- * WARNING: The `DEFAULT_ADMIN_ROLE` is also its own admin: it has permission to
- * grant and revoke this role. Extra precautions should be taken to secure
- * accounts that have been granted it.
  */
-abstract contract AccessControl is Context {
+abstract contract AccessControlUpgradeSafe is Initializable, ContextUpgradeSafe {
+    function __AccessControl_init() internal initializer {
+        __Context_init_unchained();
+        __AccessControl_init_unchained();
+    }
+
+    function __AccessControl_init_unchained() internal initializer {
+
+
+    }
+
     using EnumerableSet for EnumerableSet.AddressSet;
     using Address for address;
 
@@ -53,16 +60,6 @@ abstract contract AccessControl is Context {
     mapping (bytes32 => RoleData) private _roles;
 
     bytes32 public constant DEFAULT_ADMIN_ROLE = 0x00;
-
-    /**
-     * @dev Emitted when `newAdminRole` is set as ``role``'s admin role, replacing `previousAdminRole`
-     *
-     * `DEFAULT_ADMIN_ROLE` is the starting admin for all roles, despite
-     * {RoleAdminChanged} not being emitted signaling this.
-     *
-     * _Available since v3.1._
-     */
-    event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, bytes32 indexed newAdminRole);
 
     /**
      * @dev Emitted when `account` is granted `role`.
@@ -195,11 +192,8 @@ abstract contract AccessControl is Context {
 
     /**
      * @dev Sets `adminRole` as ``role``'s admin role.
-     *
-     * Emits a {RoleAdminChanged} event.
      */
     function _setRoleAdmin(bytes32 role, bytes32 adminRole) internal virtual {
-        emit RoleAdminChanged(role, _roles[role].adminRole, adminRole);
         _roles[role].adminRole = adminRole;
     }
 
@@ -214,4 +208,6 @@ abstract contract AccessControl is Context {
             emit RoleRevoked(role, account, _msgSender());
         }
     }
+
+    uint256[49] private __gap;
 }
