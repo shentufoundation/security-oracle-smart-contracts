@@ -139,7 +139,7 @@ contract CertiKSecurityOracle is Ownable {
   }
 
   function initialize() public onlyOwner {
-    defaultScore = 128;
+    defaultScore = 50;
 
     emit Init(defaultScore);
   }
