@@ -180,9 +180,10 @@ contract CertiKSecurityOracle is AccessControlUpgradeSafe {
     emit BatchResultUpdate(len);
   }
 
-  function initialize() public onlyAdmin {
-    defaultScore = 128;
 
+  function initialize() public onlyOwner {
+    defaultScore = 50;
+    
     emit Init(defaultScore);
   }
 
