@@ -23,18 +23,21 @@ contract CertiKSecurityOracle is AccessControlUpgradeSafe {
   mapping(address => mapping(bytes4 => Result)) private _results;
   // score to return when we don't have results available
   uint8 public defaultScore;
-  // set permitted collabotator role
-  bytes32 public constant COLLABORATOR_ROLE = keccak256("COLLABORATOR_ROLE");
+  // set permitted editor role
+  bytes32 public constant EDITOR_ROLE = keccak256("EDITOR_ROLE");
 
   constructor() public {
     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-    _setRoleAdmin(COLLABORATOR_ROLE, DEFAULT_ADMIN_ROLE);
+    _setRoleAdmin(EDITOR_ROLE, DEFAULT_ADMIN_ROLE);
+
     initialize();
   }
 
-
-  modifier onlyUsersWithWriteAccess() {
-    require(isCollaborator(msg.sender) || isAdmin(msg.sender), "restricted to contributer and administrator");
+  modifier onlyEditor() {
+    require(
+      isEditor(msg.sender) || isAdmin(msg.sender),
+      "restricted to editor and administrator"
+    );
     _;
   }
 
@@ -43,31 +46,21 @@ contract CertiKSecurityOracle is AccessControlUpgradeSafe {
     _;
   }
 
+  function isEditor(address account) public virtual view returns (bool) {
+    return hasRole(EDITOR_ROLE, account);
+  }
 
-  function isCollaborator(address account)
-    public virtual view returns (bool)
-  {
-    return hasRole(COLLABORATOR_ROLE, account);
-  }  
-
-
-  function isAdmin(address account)
-    public virtual view returns (bool)
-  {
+  function isAdmin(address account) public virtual view returns (bool) {
     return hasRole(DEFAULT_ADMIN_ROLE, account);
   }
 
-
-  function addCollaborator(address account) public virtual {
-    grantRole(COLLABORATOR_ROLE, account);
+  function grantEditor(address account) public virtual {
+    grantRole(EDITOR_ROLE, account);
   }
 
-
-  function revokeCollaborator(address account) public virtual {
-    revokeRole(COLLABORATOR_ROLE, account);
+  function revokeEditor(address account) public virtual {
+    revokeRole(EDITOR_ROLE, account);
   }
-
-
 
   function _getSecurityScore(address contractAddress, bytes4 functionSignature)
     internal
@@ -83,11 +76,10 @@ contract CertiKSecurityOracle is AccessControlUpgradeSafe {
     }
   }
 
-  function getSecurityScoreBytes4(address contractAddress, bytes4 functionSignature)
-    public
-    view
-    returns (uint8)
-  {
+  function getSecurityScoreBytes4(
+    address contractAddress,
+    bytes4 functionSignature
+  ) public view returns (uint8) {
     require(contractAddress != address(0), "address should not be 0x0");
     require(
       functionSignature != bytes4(0),
@@ -142,12 +134,12 @@ contract CertiKSecurityOracle is AccessControlUpgradeSafe {
     bytes4 functionSignature,
     uint8 score,
     uint248 expiration
-  ) public onlyUsersWithWriteAccess {
+  ) public onlyEditor {
     require(
       contractAddress != address(0),
       "contract address should not be 0x0"
     );
-    
+
     _results[contractAddress][functionSignature] = Result(score, expiration);
 
     emit ResultUpdate(contractAddress, functionSignature, score, expiration);
@@ -158,7 +150,7 @@ contract CertiKSecurityOracle is AccessControlUpgradeSafe {
     bytes4[] memory functionSignatures,
     uint8[] memory scores,
     uint248[] memory expirations
-  ) public onlyUsersWithWriteAccess {
+  ) public onlyEditor {
     require(
       contractAddresses.length == functionSignatures.length &&
         functionSignatures.length == scores.length &&
@@ -180,10 +172,9 @@ contract CertiKSecurityOracle is AccessControlUpgradeSafe {
     emit BatchResultUpdate(len);
   }
 
-
-  function initialize() public onlyOwner {
+  function initialize() public onlyAdmin {
     defaultScore = 50;
-    
+
     emit Init(defaultScore);
   }
 
