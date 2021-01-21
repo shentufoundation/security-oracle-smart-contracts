@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.5.17;
+pragma solidity 0.6.12;
 
-import "./openzeppelin/Ownable.sol";
+import "./openzeppelin/AccessControl.sol";
 
-contract CertiKSecurityOracle is Ownable {
+contract CertiKSecurityOracle is AccessControlUpgradeSafe {
   event Init(uint8 defaultScore);
   event ResultUpdate(
     address indexed target,
@@ -23,9 +23,43 @@ contract CertiKSecurityOracle is Ownable {
   mapping(address => mapping(bytes4 => Result)) private _results;
   // score to return when we don't have results available
   uint8 public defaultScore;
+  // set permitted editor role
+  bytes32 public constant EDITOR_ROLE = keccak256("EDITOR_ROLE");
 
   constructor() public {
+    _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    _setRoleAdmin(EDITOR_ROLE, DEFAULT_ADMIN_ROLE);
+
     initialize();
+  }
+
+  modifier onlyEditor() {
+    require(
+      isEditor(msg.sender) || isAdmin(msg.sender),
+      "restricted to editor and administrator"
+    );
+    _;
+  }
+
+  modifier onlyAdmin() {
+    require(isAdmin(msg.sender), "restricted to administrator");
+    _;
+  }
+
+  function isEditor(address account) public virtual view returns (bool) {
+    return hasRole(EDITOR_ROLE, account);
+  }
+
+  function isAdmin(address account) public virtual view returns (bool) {
+    return hasRole(DEFAULT_ADMIN_ROLE, account);
+  }
+
+  function grantEditor(address account) public virtual {
+    grantRole(EDITOR_ROLE, account);
+  }
+
+  function revokeEditor(address account) public virtual {
+    revokeRole(EDITOR_ROLE, account);
   }
 
   function _getSecurityScore(address contractAddress, bytes4 functionSignature)
@@ -42,11 +76,10 @@ contract CertiKSecurityOracle is Ownable {
     }
   }
 
-  function getSecurityScoreBytes4(address contractAddress, bytes4 functionSignature)
-    public
-    view
-    returns (uint8)
-  {
+  function getSecurityScoreBytes4(
+    address contractAddress,
+    bytes4 functionSignature
+  ) public view returns (uint8) {
     require(contractAddress != address(0), "address should not be 0x0");
     require(
       functionSignature != bytes4(0),
@@ -101,11 +134,12 @@ contract CertiKSecurityOracle is Ownable {
     bytes4 functionSignature,
     uint8 score,
     uint248 expiration
-  ) public onlyOwner {
+  ) public onlyEditor {
     require(
       contractAddress != address(0),
       "contract address should not be 0x0"
     );
+
     _results[contractAddress][functionSignature] = Result(score, expiration);
 
     emit ResultUpdate(contractAddress, functionSignature, score, expiration);
@@ -116,7 +150,7 @@ contract CertiKSecurityOracle is Ownable {
     bytes4[] memory functionSignatures,
     uint8[] memory scores,
     uint248[] memory expirations
-  ) public onlyOwner {
+  ) public onlyEditor {
     require(
       contractAddresses.length == functionSignatures.length &&
         functionSignatures.length == scores.length &&
@@ -138,13 +172,13 @@ contract CertiKSecurityOracle is Ownable {
     emit BatchResultUpdate(len);
   }
 
-  function initialize() public onlyOwner {
+  function initialize() public onlyAdmin {
     defaultScore = 50;
 
     emit Init(defaultScore);
   }
 
-  function updateDefaultScore(uint8 score) public onlyOwner {
+  function updateDefaultScore(uint8 score) public onlyAdmin {
     defaultScore = score;
 
     emit DefaultScoreChanged(score);
