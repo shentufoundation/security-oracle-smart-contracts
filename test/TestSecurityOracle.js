@@ -41,27 +41,25 @@ contract("SecurityOracle", () => {
   it("should proceed for contract address and non 0 function signature call", async function () {
     await so.getSecurityScoreBytes4(
       "0xc06Ca4a7DaEB0D1601Bb47297d9Fd170f231D872",
-      [0, 0, 0, 1]
+      "0x00000001"
     );
   });
 
   it("should revert if function signature is 0", async function () {
     await tryCatch(
-      so.getSecurityScoreBytes4("0xc06Ca4a7DaEB0D1601Bb47297d9Fd170f231D872", [
-        0,
-        0,
-        0,
-        0
-      ]),
+      so.getSecurityScoreBytes4(
+        "0xc06Ca4a7DaEB0D1601Bb47297d9Fd170f231D872",
+        "0x00000000"
+      ),
       "revert"
     );
   });
 });
 
 contract("SecurityOracle Role Access", accounts => {
-  const admin = accounts[0]; // "0x1b65cE4741c3919E2C278b0c90BfF72D28d4A048";
-  const editor = accounts[1]; // "0x9bf68cFd9B26f939A8259c3db0bb617F3B1736ca";
-  const reader = accounts[2]; //"0x849A5959cD2fCaA7162Bb60dcf5D7FFEb3281B9b";
+  const admin = accounts[0];
+  const editor = accounts[1];
+  const reader = accounts[2];
   let so;
 
   before(async function () {
@@ -101,13 +99,13 @@ contract("SecurityOracle Role Access", accounts => {
 
   it("should only allow editor and admin to push result", async function () {
     await tryCatch(
-      so.pushResult.call(admin, "0x0", 10, 10, { from: reader }),
+      so.pushResult.call(admin, "0x00000001", 10, 10, { from: reader }),
       "revert"
     );
 
     await so.grantEditor(editor);
-    await so.pushResult.call(admin, "0x0", 10, 10, { from: editor });
+    await so.pushResult.call(admin, "0x00000001", 10, 10, { from: editor });
 
-    await so.pushResult.call(admin, "0x0", 10, 10, { from: admin });
+    await so.pushResult.call(admin, "0x00000001", 10, 10, { from: admin });
   });
 });
