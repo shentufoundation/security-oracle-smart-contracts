@@ -1,4 +1,4 @@
-# CertiK Security Oracle Smart Contracts
+# Shentu Security Oracle Smart Contracts
 
 Decentralized real-time auditing for your smart contracts.
 
