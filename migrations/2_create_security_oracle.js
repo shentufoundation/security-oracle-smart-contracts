@@ -8,7 +8,7 @@ module.exports = async function(deployer, network, accounts) {
       }
     );
 
-    console.log("CertiKSecurityOracle deployed");
+    
   } catch (e) {
     console.log("Error deploy", e);
   }

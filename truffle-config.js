@@ -12,14 +12,14 @@ module.exports = {
         const privateKey = process.env.TRUFFLE_PRIVATE_KEY;
 
         if (!privateKey) {
-          console.log("missing env var TRUFFLE_PRIVATE_KEY");
+          
           process.exit(1);
         }
 
         const rpc = process.env.TRUFFLE_RPC;
 
         if (!rpc) {
-          console.log("missing env var TRUFFLE_RPC");
+          
           process.exit(1);
         }
 
